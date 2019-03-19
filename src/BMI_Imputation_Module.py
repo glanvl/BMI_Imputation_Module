@@ -50,7 +50,7 @@ def getFile():
         
     #return "mike"  
 
-    return imputeddataset.to_json(orient='records')
+    return imputeddataset#.to_json(orient='records')
 
 def get_iqrs(means, moves):
    print('Calculating interquartile ranges....')   
