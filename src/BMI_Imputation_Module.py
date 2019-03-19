@@ -7,6 +7,7 @@ import json
 
 def apply(input):
     finalResult = getFile()
+    finalResult = finalResult.to_csv(index=False)
     print("HERE?")
     Algorithmia.client().file("data://glanvl/BMIData/output_Lamb_Test.csv").put(str(finalResult))
     return finalResult #.to_json(orient='records')[1:-1].replace('}, {','},{')
