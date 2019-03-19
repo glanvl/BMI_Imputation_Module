@@ -18,36 +18,35 @@ def getFile():
    # path = "data://kingmike/testcollection/mike2.csv"
     file = client.file("data://glanvl/BMIData/luke2.csv")
     period = 201809
-    if(file.exists):
-        dataframe = pd.read_csv(StringIO(file.getString()),index_col=False)
-       # kingmike/BMIImputationCheck4NonResp
-        responderdata = checknonresp(dataframe,period)
-        #responderdata = callCheckNonResp(dataframe)
-        print(str(responderdata))
-        movementData = doMovement(responderdata,period)
-        moves = add_reg_fourteen(movementData)
-        movesdata= pd.DataFrame(moves)
-        means = calculateMeans(movesdata,moves)
-        iqrs = get_iqrs(means, movesdata)
+    dataframe = pd.read_csv(StringIO(file.getString()),index_col=False)
+    # kingmike/BMIImputationCheck4NonResp
+    responderdata = checknonresp(dataframe,period)
+    #responderdata = callCheckNonResp(dataframe)
+    print(str(responderdata))
+    movementData = doMovement(responderdata,period)
+    moves = add_reg_fourteen(movementData)
+    movesdata= pd.DataFrame(moves)
+    means = calculateMeans(movesdata,moves)
+    iqrs = get_iqrs(means, movesdata)
+    
         
-        
-        input_data = pd.merge(iqrs, movesdata, how='left', on=['region', 'strata', 'responder_id'])
-        non_atyp_data=input_data.apply(remAtypicals,axis=1)
-        print(str(non_atyp_data.columns.values))
-        remeaned_data = recalc_means(non_atyp_data).drop_duplicates()
-        gbimp_data= remeaned_data[(remeaned_data.region == 14)].apply(calcGBImputation,axis=1)
-        print(str(gbimp_data.columns.values))
-        #reorder and drop unneeded rows
-        gbimp_data = gbimp_data[['strata','gbimp1','gbimp2','gbimp3','gbimp4','gbimp5','gbimp6','gbimp7']]
-        output_data = remeaned_data.merge(gbimp_data,left_on = ['strata'],right_on = ['strata'],how='inner')
-        #filter out any data without a region or from a diff period
-        impstat=filterData(output_data,period)
-        impstat=impstat.apply(assignMoM,axis= 1) 
-     #   
-        datasetandimps = prep_for_appimp(dataframe,impstat, period)
-        imputeddataset = datasetandimps.apply(applyFactors,axis=1)
+    input_data = pd.merge(iqrs, movesdata, how='left', on=['region', 'strata', 'responder_id'])
+    non_atyp_data=input_data.apply(remAtypicals,axis=1)
+    print(str(non_atyp_data.columns.values))
+    remeaned_data = recalc_means(non_atyp_data).drop_duplicates()
+    gbimp_data= remeaned_data[(remeaned_data.region == 14)].apply(calcGBImputation,axis=1)
+    print(str(gbimp_data.columns.values))
+    #reorder and drop unneeded rows
+    gbimp_data = gbimp_data[['strata','gbimp1','gbimp2','gbimp3','gbimp4','gbimp5','gbimp6','gbimp7']]
+    output_data = remeaned_data.merge(gbimp_data,left_on = ['strata'],right_on = ['strata'],how='inner')
+    #filter out any data without a region or from a diff period
+    impstat=filterData(output_data,period)
+    impstat=impstat.apply(assignMoM,axis= 1) 
+      
+    datasetandimps = prep_for_appimp(dataframe,impstat, period)
+    imputeddataset = datasetandimps.apply(applyFactors,axis=1)
   #      
-        callIQR(dataframe['Q601_asphalting_sand'])
+    callIQR(dataframe['Q601_asphalting_sand'])
         
     #return "mike"  
 
